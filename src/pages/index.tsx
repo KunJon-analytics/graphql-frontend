@@ -1,56 +1,51 @@
-import {
-  Link as ChakraLink,
-  Text,
-  Code,
-  List,
-  ListIcon,
-  ListItem,
-} from '@chakra-ui/react'
-import { CheckCircleIcon, LinkIcon } from '@chakra-ui/icons'
+import { useQuery } from "urql";
+import { PostsDocument } from "../gql/graphql";
+import { withUrqlClient } from "next-urql";
+import getUrqlClient from "../utils/urqlClient";
+import { Stack, Flex, Heading, Link, Box, Text } from "@chakra-ui/react";
+import NextLink from "next/link";
 
-import { Hero } from '../components/Hero'
-import { Container } from '../components/Container'
-import { Main } from '../components/Main'
-import { DarkModeSwitch } from '../components/DarkModeSwitch'
-import { CTA } from '../components/CTA'
-import { Footer } from '../components/Footer'
+import { Layout } from "../components/Layout";
 
-const Index = () => (
-  <Container height="100vh">
-    <Hero />
-    <Main>
-      <Text color="text">
-        Example repository of <Code>Next.js</Code> + <Code>chakra-ui</Code> +{' '}
-        <Code>TypeScript</Code>.
-      </Text>
+const Index = () => {
+  const [{ fetching: loading, data, error }, _] = useQuery({
+    query: PostsDocument,
+  });
 
-      <List spacing={3} my={0} color="text">
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink
-            isExternal
-            href="https://chakra-ui.com"
-            flexGrow={1}
-            mr={2}
-          >
-            Chakra UI <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink isExternal href="https://nextjs.org" flexGrow={1} mr={2}>
-            Next.js <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-      </List>
-    </Main>
+  if (!loading && !data?.posts) {
+    return (
+      <div>
+        <div>you got query failed for some reason</div>
+        <div>{error?.message}</div>
+      </div>
+    );
+  }
 
-    <DarkModeSwitch />
-    <Footer>
-      <Text>Next ❤️ Chakra</Text>
-    </Footer>
-    <CTA />
-  </Container>
-)
+  return (
+    <Layout>
+      {!data?.posts && loading ? (
+        <div>loading...</div>
+      ) : (
+        <Stack spacing={8}>
+          {data.posts.map((p) => (
+            <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
+              <Box flex={1}>
+                <Link as={NextLink} href={`/post/${p.id}`} mr={2}>
+                  <Heading fontSize="xl">{p.title}</Heading>
+                </Link>
+                {/* <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                  <Link>
+                    <Heading fontSize="xl">{p.title}</Heading>
+                  </Link>
+                </NextLink> */}
+                <Text>{p.text}</Text>
+              </Box>
+            </Flex>
+          ))}
+        </Stack>
+      )}
+    </Layout>
+  );
+};
 
-export default Index
+export default withUrqlClient(getUrqlClient, { ssr: true })(Index);
