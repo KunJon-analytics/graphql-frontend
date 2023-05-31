@@ -14,7 +14,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "fragment RegularError on FieldError {\n  field\n  message\n}": types.RegularErrorFragmentDoc,
-    "fragment RegularPost on Post {\n  id\n  title\n  createdAt\n  updatedAt\n  voteStatus\n  text\n  points\n  creatorId\n}": types.RegularPostFragmentDoc,
+    "fragment RegularPost on Post {\n  id\n  title\n  createdAt\n  updatedAt\n  voteStatus\n  text\n  points\n  creatorId\n  creator {\n    id\n    email\n    username\n  }\n}": types.RegularPostFragmentDoc,
     "fragment RegularUser on User {\n  id\n  username\n}": types.RegularUserFragmentDoc,
     "fragment RegularUserResponse on UserResponse {\n  errors {\n    ...RegularError\n  }\n  user {\n    ...RegularUser\n  }\n}": types.RegularUserResponseFragmentDoc,
     "mutation ChangePassword($newPassword: String!, $token: String!) {\n  changePassword(newPassword: $newPassword, token: $token) {\n    ...RegularUserResponse\n  }\n}": types.ChangePasswordDocument,
@@ -24,7 +24,7 @@ const documents = {
     "mutation Logout {\n  logout\n}": types.LogoutDocument,
     "mutation Register($options: UsernamePasswordInput!) {\n  register(options: $options) {\n    ...RegularUserResponse\n  }\n}": types.RegisterDocument,
     "query Me {\n  me {\n    ...RegularUserResponse\n  }\n}": types.MeDocument,
-    "query Posts {\n  posts {\n    ...RegularPost\n  }\n}": types.PostsDocument,
+    "query Posts($limit: Int!, $cursor: String) {\n  posts(limit: $limit, cursor: $cursor) {\n    posts {\n      ...RegularPost\n    }\n    hasMore\n  }\n}": types.PostsDocument,
 };
 
 /**
@@ -48,7 +48,7 @@ export function graphql(source: "fragment RegularError on FieldError {\n  field\
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "fragment RegularPost on Post {\n  id\n  title\n  createdAt\n  updatedAt\n  voteStatus\n  text\n  points\n  creatorId\n}"): (typeof documents)["fragment RegularPost on Post {\n  id\n  title\n  createdAt\n  updatedAt\n  voteStatus\n  text\n  points\n  creatorId\n}"];
+export function graphql(source: "fragment RegularPost on Post {\n  id\n  title\n  createdAt\n  updatedAt\n  voteStatus\n  text\n  points\n  creatorId\n  creator {\n    id\n    email\n    username\n  }\n}"): (typeof documents)["fragment RegularPost on Post {\n  id\n  title\n  createdAt\n  updatedAt\n  voteStatus\n  text\n  points\n  creatorId\n  creator {\n    id\n    email\n    username\n  }\n}"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -88,7 +88,7 @@ export function graphql(source: "query Me {\n  me {\n    ...RegularUserResponse\
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "query Posts {\n  posts {\n    ...RegularPost\n  }\n}"): (typeof documents)["query Posts {\n  posts {\n    ...RegularPost\n  }\n}"];
+export function graphql(source: "query Posts($limit: Int!, $cursor: String) {\n  posts(limit: $limit, cursor: $cursor) {\n    posts {\n      ...RegularPost\n    }\n    hasMore\n  }\n}"): (typeof documents)["query Posts($limit: Int!, $cursor: String) {\n  posts(limit: $limit, cursor: $cursor) {\n    posts {\n      ...RegularPost\n    }\n    hasMore\n  }\n}"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};

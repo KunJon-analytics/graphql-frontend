@@ -27,6 +27,7 @@ const getUrqlClient: NextUrqlClientConfig = (_ssr, ctx) => {
         keys: {
           UserResponse: (data) => data.__typename,
           FieldError: (data) => data.__typename,
+          PaginatedPosts: (data) => null,
         },
         updates: {
           Mutation: {
@@ -89,9 +90,10 @@ const getUrqlClient: NextUrqlClientConfig = (_ssr, ctx) => {
               info
             ) => {
               cache.updateQuery(
-                { query: PostsDocument },
+                { query: PostsDocument, variables: { limit: 3 } },
                 (data): PostsQuery => {
-                  data.posts.push(result.createPost);
+                  data.posts.posts.unshift(result.createPost);
+
                   return data;
                 }
               );
