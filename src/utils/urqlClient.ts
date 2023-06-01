@@ -89,14 +89,7 @@ const getUrqlClient: NextUrqlClientConfig = (_ssr, ctx) => {
               cache,
               info
             ) => {
-              cache.updateQuery(
-                { query: PostsDocument, variables: { limit: 3 } },
-                (data): PostsQuery => {
-                  data.posts.posts.unshift(result.createPost);
-
-                  return data;
-                }
-              );
+              cache.invalidate("Query", "posts", { limit: 3 });
             },
           },
         },

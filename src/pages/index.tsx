@@ -16,8 +16,10 @@ import {
 import NextLink from "next/link";
 
 import { Layout } from "../components/Layout";
+import { UpdootSection } from "../components/UpdootSection";
+import { EditDeletePostButtons } from "../components/EditDeletePostButtons";
 
-const limit = 3;
+export const limit = 3;
 
 const Index = () => {
   const [cursor, setCursor] = useState<string>(null);
@@ -43,22 +45,32 @@ const Index = () => {
         <div>loading...</div>
       ) : (
         <Stack spacing={8}>
-          {data.posts.posts.slice(0, limit).map((p) => (
-            <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
-              <Box flex={1}>
-                <Link as={NextLink} href={`/post/${p.id}`} mr={2}>
-                  <Heading fontSize="xl">{p.title}</Heading>
-                </Link>
-                {/* <NextLink href="/post/[id]" as={`/post/${p.id}`}>
-                  <Link>
-                    <Heading fontSize="xl">{p.title}</Heading>
-                  </Link>
-                </NextLink> */}
-                <Text>{p.text}</Text>
-                <Text>Creator: {p.creator.username}</Text>
-              </Box>
-            </Flex>
-          ))}
+          {data.posts.posts.map((p) =>
+            !p ? null : (
+              <Flex key={p.id} p={5} shadow="md" borderWidth="1px">
+                <UpdootSection post={p} />
+                <Box flex={1}>
+                  <NextLink href="/post/[id]" as={`/post/${p.id}`}>
+                    <Link>
+                      <Heading fontSize="xl">{p.title}</Heading>
+                    </Link>
+                  </NextLink>
+                  <Text>posted by {p.creator.username}</Text>
+                  <Flex align="center">
+                    <Text flex={1} mt={4}>
+                      {p.textSnippet}
+                    </Text>
+                    <Box ml="auto">
+                      <EditDeletePostButtons
+                        id={p.id}
+                        creatorId={p.creator.id}
+                      />
+                    </Box>
+                  </Flex>
+                </Box>
+              </Flex>
+            )
+          )}
         </Stack>
       )}
       {data && data.posts.hasMore ? (
